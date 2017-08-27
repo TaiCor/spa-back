@@ -2,6 +2,9 @@ var cookieSession = require('cookie-session');
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var fileUpload = require('express-fileupload');
+var shortid = require('shortid');
+var path = require('path')
 
 var sql = {
   comments: require("./sql/comments"),
@@ -11,7 +14,7 @@ var sql = {
 };
 
 var app = express();
-
+app.use(express.static('public'));
 app.use(function (req, res, next) {
   //res.setHeader('Access-Control-Allow-Origin', 'http://192.168.0.205:8080');
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
@@ -22,6 +25,7 @@ app.use(function (req, res, next) {
 });
 
 //Add post data to req.body
+app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -113,6 +117,29 @@ app.post('/addPhoto', function (req, res, next) {
       res.send(photo);
       res.end();
     });
+});
+
+app.post('/addPost', function (req, res, next){
+  if (!req.files)
+    return res.status(400).send('No files were uploaded');
+  else {
+    let file = req.files.foto
+    let extantion = path.extname(req.files.foto.name);
+    if (extantion !== '.png' || extantion !== '.gif' || extantion !== '.jpg' || extantion !== '.webp') {
+      res.send('Only image are allowed!')
+    } else {
+      file.name =  (shortid.generate() + extantion);
+      file.mv(__dirname + `/public/images/${file.name}`, function(err) {
+        if (err) {
+          return res.status(500).send(err);
+        } else {
+          let url = `localhost:3000/images/${file.name}`;
+          let title = req.body.title;
+          let description = req.body.description
+        }
+      });
+    }
+  }
 });
 
 app.post('/deletePhotoById', function (req, res, next) {
