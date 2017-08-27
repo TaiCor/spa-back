@@ -125,7 +125,8 @@ app.post('/addPost', function (req, res, next){
   else {
     let file = req.files.foto
     let extantion = path.extname(req.files.foto.name);
-    if (extantion !== '.png' || extantion !== '.gif' || extantion !== '.jpg' || extantion !== '.webp') {
+    console.log(extantion);
+    if (extantion !== '.png' && extantion !== '.gif' && extantion !== '.jpg' && extantion !== '.webp') {
       res.send('Only image are allowed!')
     } else {
       file.name =  (shortid.generate() + extantion);
@@ -133,9 +134,14 @@ app.post('/addPost', function (req, res, next){
         if (err) {
           return res.status(500).send(err);
         } else {
-          let url = `localhost:3000/images/${file.name}`;
-          let title = req.body.title;
-          let description = req.body.description
+          let url = `localhost:3000/images/${file.name}`,
+          title = req.body.title,
+          description = req.body.description;
+          sql.photos.addPhoto(req.session.id, url, title, description)
+          .then(post => {
+            res.send(post);
+            res.end();
+          })
         }
       });
     }

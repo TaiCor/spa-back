@@ -112,33 +112,6 @@ function addPhoto(userId, url, title, description) {
     });
 }
 
-function addPost (userId, url, title, description) {
-  return knex('photos')
-    .insert({
-      user_id: userId,
-      url: url,
-      title: title,
-      description: description
-    })
-    .then(photoId => {
-      var query = `select p.photo_id as id, url, title, description, p.user_id as author_id, u.name as author_name, created, updated, avg(ratingTable.rating) as commonRating, commentsTable.comments as commentsLength, userRatingTable.rating as userRating
-        from photos p
-        left join (select user_id, name from users) u
-        on p.user_id = u.user_id
-        left join (select photo_id, rating from ratings) as ratingTable
-        on p.photo_id = ratingTable.photo_id
-        left join (select photo_id, count(photo_id) comments from photo_album.comments group by photo_id) commentsTable
-        on p.photo_id = commentsTable.photo_id
-        left join (select photo_id, user_id, rating from ratings where user_id = ${userId}) userRatingTable
-        on p.photo_id = userRatingTable.photo_id
-        where p.photo_id = ${photoId} group by p.photo_id`;
-      return knex.raw(query)
-        .then(photos => {
-          return normalizePhoto(photos[0][0]);
-        });
-    });
-}
-
 exports.addPhoto = addPhoto;
 exports.deletePhotoById = deletePhotoById;
 exports.changePhoto = changePhoto;
