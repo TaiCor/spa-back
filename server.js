@@ -4,7 +4,10 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var fileUpload = require('express-fileupload');
 var shortid = require('shortid');
-var path = require('path')
+var path = require('path');
+var multiparty = require('connect-multiparty');
+var multipartyMiddleware = multiparty();
+var upload = multer({dest:'/uploads'})
 
 var sql = {
   comments: require("./sql/comments"),
@@ -119,12 +122,13 @@ app.post('/addPhoto', function (req, res, next) {
     });
 });
 
-app.post('/addPost', function (req, res, next){
-  if (!req.files)
+app.post('/addPost', upload.single('file'), function (req, res, next){
+  if (!req.file)
     return res.status(400).send('No files were uploaded');
   else {
-    let file = req.files.foto
-    let extantion = path.extname(req.files.foto.name);
+    let file = req.file.foto
+    console.log(file);
+    let extantion = path.extname(req.file.foto.name);
     console.log(extantion);
     if (extantion !== '.png' && extantion !== '.gif' && extantion !== '.jpg' && extantion !== '.webp') {
       res.status(400).send('Only image are allowed!')
@@ -134,7 +138,7 @@ app.post('/addPost', function (req, res, next){
         if (err) {
           return res.status(500).send(err);
         } else {
-          let url = `localhost:3000/images/${file.name}`,
+          let url = `http://localhost:3000/images/${file.name}`,
           title = req.body.title,
           description = req.body.description;
           sql.photos.addPhoto(req.session.id, url, title, description)
@@ -146,7 +150,12 @@ app.post('/addPost', function (req, res, next){
       });
     }
   }
-});
+}); 
+
+var FileUploadController = require('./FileUploadController.js');
+
+// Example endpoint 
+app.post('/res', multipartyMiddleware, FileUploadController.uploadFile);
 
 app.post('/deletePhotoById', function (req, res, next) {
   sql.photos.deletePhotoById(req.body.photoId, req.session.id)

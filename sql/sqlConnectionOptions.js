@@ -4,7 +4,8 @@ var knex = require('knex')({
     host: 'localhost',
     user: 'root',
     password: 'vandal123',
-    database: 'photo_album'
+    database: 'photo_album',
+    port: 5000
   }
 });
 
