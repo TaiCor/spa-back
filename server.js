@@ -127,7 +127,7 @@ app.post('/addPost', function (req, res, next){
     let extantion = path.extname(req.files.foto.name);
     console.log(extantion);
     if (extantion !== '.png' && extantion !== '.gif' && extantion !== '.jpg' && extantion !== '.webp') {
-      res.send('Only image are allowed!')
+      res.status(400).send('Only image are allowed!')
     } else {
       file.name =  (shortid.generate() + extantion);
       file.mv(__dirname + `/public/images/${file.name}`, function(err) {
