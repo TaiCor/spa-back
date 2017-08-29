@@ -131,15 +131,11 @@ app.post('/addPhoto', function (req, res, next) {
 });
 
 app.post('/addPost', upload.single('file'), function (req, res, next){
-  console.log(req.file)
-  console.log(req.body)
   if (!req.file)
     return res.status(400).send('No files were uploaded');
   else {
-    let file = req.file
-    console.log(file);
+    let file = req.file;
     let extantion = path.extname(req.file.originalname);
-    console.log(extantion);
     if (extantion !== '.png' && extantion !== '.gif' && extantion !== '.jpg' && extantion !== '.webp') {
       res.status(400).send('Only image are allowed!')
     } else {
