@@ -143,13 +143,8 @@ app.post('/addPost', upload.single('file'), function (req, res, next){
       let title = req.body.title;
       let description = req.body.description;
       sql.photos.addPhoto(req.session.id, url, title, description)
-      .then(() => {
-        let data = {
-          url: url,
-          title: title,
-          description: description
-        }
-        res.send(data);
+      .then((resp) => {
+        res.json(resp);
       })
     }
   }
