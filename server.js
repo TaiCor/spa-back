@@ -2,12 +2,20 @@ var cookieSession = require('cookie-session');
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-var fileUpload = require('express-fileupload');
+//var fileUpload = require('express-fileupload');
 var shortid = require('shortid');
 var path = require('path');
 var multiparty = require('connect-multiparty');
-var multipartyMiddleware = multiparty();
-var upload = multer({dest:'/uploads'})
+//var multipartyMiddleware = multiparty();
+
+var storage = multer.diskStorage({
+  destination: './public/images',  
+  filename: function(req, file, callback) {
+		callback(null, shortid.generate() + path.extname(file.originalname))
+	}
+})
+var upload = multer({storage: storage})
+
 
 var sql = {
   comments: require("./sql/comments"),
@@ -28,7 +36,7 @@ app.use(function (req, res, next) {
 });
 
 //Add post data to req.body
-app.use(fileUpload());
+//app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -123,39 +131,33 @@ app.post('/addPhoto', function (req, res, next) {
 });
 
 app.post('/addPost', upload.single('file'), function (req, res, next){
+  console.log(req.file)
+  console.log(req.body)
   if (!req.file)
     return res.status(400).send('No files were uploaded');
   else {
-    let file = req.file.foto
+    let file = req.file
     console.log(file);
-    let extantion = path.extname(req.file.foto.name);
+    let extantion = path.extname(req.file.originalname);
     console.log(extantion);
     if (extantion !== '.png' && extantion !== '.gif' && extantion !== '.jpg' && extantion !== '.webp') {
       res.status(400).send('Only image are allowed!')
     } else {
-      file.name =  (shortid.generate() + extantion);
-      file.mv(__dirname + `/public/images/${file.name}`, function(err) {
-        if (err) {
-          return res.status(500).send(err);
-        } else {
-          let url = `http://localhost:3000/images/${file.name}`,
-          title = req.body.title,
-          description = req.body.description;
-          sql.photos.addPhoto(req.session.id, url, title, description)
-          .then(post => {
-            res.send(post);
-            res.end();
-          })
+      let url = `http://localhost:3000/images/${file.filename}`;
+      let title = req.body.title;
+      let description = req.body.description;
+      sql.photos.addPhoto(req.session.id, url, title, description)
+      .then(() => {
+        let data = {
+          url: url,
+          title: title,
+          description: description
         }
-      });
+        res.send(data);
+      })
     }
   }
 }); 
-
-var FileUploadController = require('./FileUploadController.js');
-
-// Example endpoint 
-app.post('/res', multipartyMiddleware, FileUploadController.uploadFile);
 
 app.post('/deletePhotoById', function (req, res, next) {
   sql.photos.deletePhotoById(req.body.photoId, req.session.id)
