@@ -67,6 +67,7 @@ app.post('/addComment', function (req, res, next) {
 });
 
 app.post('/deleteCommentById', function (req, res, next) {
+  console.log(req.body.commentId)
   sql.comments.deleteCommentById(req.body.commentId)
     .then(() => {
       res.send();

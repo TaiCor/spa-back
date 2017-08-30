@@ -19,7 +19,7 @@ function getCommentsByPhotoId(photoId) {
 
 function getUserByComment(comment_id){
   return knex('comments as c')
-  .select('u.name as author_name', 'c.commented')
+  .select('u.name as author_name', 'c.commented', 'c.comment_id')
   .leftJoin('users as u', 'u.user_id', 'c.user_id')
   .where('c.comment_id', comment_id)
 }
