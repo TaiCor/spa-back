@@ -2,11 +2,8 @@ var cookieSession = require('cookie-session');
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-//var fileUpload = require('express-fileupload');
 var shortid = require('shortid');
 var path = require('path');
-var multiparty = require('connect-multiparty');
-//var multipartyMiddleware = multiparty();
 
 var storage = multer.diskStorage({
   destination: './public/images',  
@@ -36,7 +33,6 @@ app.use(function (req, res, next) {
 });
 
 //Add post data to req.body
-//app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -76,7 +72,7 @@ app.post('/deleteCommentById', function (req, res, next) {
 });
 
 app.post('/changeComment', function (req, res, next) {
-  sql.comments.changeComment(req.body.commentId, req.body.comment)
+  sql.comments.changeComment(req.body.commentId, req.body.bodyComment)
     .then(() => {
       res.send();
       res.end();
