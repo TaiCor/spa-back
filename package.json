@@ -9,5 +9,8 @@
     "multer": "^1.2.0",
     "mysql": "^2.11.1",
     "shortid": "^2.2.8"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
   }
 }
