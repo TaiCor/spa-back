@@ -53,8 +53,6 @@ app.use(function (req, res, next) {
 
 //Comments
 app.post('/addComment', function (req, res, next) {
-  console.log(req.body.photoId, req.body.comment)
-  console.log(req.body)
   sql.comments.addComment(req.body.photoId, req.session.id, req.body.comment)
     .then((name) => {
       res.json(name);
@@ -63,7 +61,6 @@ app.post('/addComment', function (req, res, next) {
 });
 
 app.post('/deleteCommentById', function (req, res, next) {
-  console.log(req.body.commentId)
   sql.comments.deleteCommentById(req.body.commentId)
     .then(() => {
       res.send();
@@ -189,11 +186,11 @@ app.post('/addRating', function (req, res, next) {
 });
 
 //Users
-app.get('/changeUser/:login/:name', function (req, res, next) {
-  sql.users.checkLoginExistence(req.session.id, req.params.login)
+app.post('/changeUser', function (req, res, next) {
+  sql.users.checkLoginExistence(req.session.id, req.body.login)
     .then(loginExistence => {
       if (!loginExistence) {
-        sql.users.changeUser(req.session.id, req.params.login, req.params.name)
+        sql.users.changeUser(req.session.id, req.body.login, req.body.name)
           .then(() => {
             return sql.users.getCurrentUser(req.session.id);
           })
