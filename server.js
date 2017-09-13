@@ -246,4 +246,18 @@ app.post('/register', function (req, res, next) {
     });
 });
 
+app.post('/changePassword', function(req, res) {
+  console.log(req.body.newPassword);
+  sql.users.checkPassword(req.session.id, req.body.oldPassword)
+  .then(resp => {
+    if (resp) {
+      sql.users.updatePassword(req.session.id, req.body.newPassword).then(
+        () => { res.send(true);}
+      )
+    } else {
+      res.send(false);
+    }
+  })
+})
+
 app.listen(3000);

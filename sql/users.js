@@ -49,6 +49,25 @@ function checkLoginExistence(userId, login) {
     });
 }
 
+function checkPassword(userId, password) {
+  return knex('users')
+  .select('password')
+  .where('user_id', '=', userId)
+  .then(resp => {
+    console.log(resp['0'])
+    if (resp['0'].password === password) {
+      return true
+    } else {
+      return false
+    }
+  })
+}
+
+function updatePassword(userId, password) {
+  console.log(password);
+  return knex.raw(`update users set password = '${password}' where user_id = ${userId};`);
+}
+
 function changeUser(userId, login, name) {
   return knex.raw(`update users set login = '${login}' , name='${name}' where user_id = ${userId};`);
 }
@@ -98,9 +117,12 @@ function register(login, password, name) {
     });
 }
 
+
 exports.changeUser = changeUser;
 exports.checkLoginExistence = checkLoginExistence;
 exports.getUserById = getUserById;
 exports.getCurrentUser = getCurrentUser;
 exports.login = login;
 exports.register = register;
+exports.checkPassword = checkPassword;
+exports.updatePassword = updatePassword;
