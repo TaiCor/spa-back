@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var shortid = require('shortid');
 var path = require('path');
+var baseUrl
 
 var storage = multer.diskStorage({
   destination: './public/images',  
