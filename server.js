@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var shortid = require('shortid');
 var path = require('path');
-var baseUrl
+var baseUrl = 'http://localhost:8080';
 
 var storage = multer.diskStorage({
   destination: './public/images',  
@@ -26,7 +26,7 @@ var app = express();
 app.use(express.static('public'));
 app.use(function (req, res, next) {
   //res.setHeader('Access-Control-Allow-Origin', 'http://192.168.0.205:8080');
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.setHeader('Access-Control-Allow-Origin', `${baseUrl}`);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,accept,content-type');
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -196,7 +196,8 @@ app.post('/changeUser', function (req, res, next) {
             return sql.users.getCurrentUser(req.session.id);
           })
           .then(user => {
-            res.send(user);
+            console.log(user)
+            res.send(req.body);
             res.end();
           });
       }
