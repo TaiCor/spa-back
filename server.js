@@ -5,9 +5,10 @@ var multer = require('multer');
 var shortid = require('shortid');
 var path = require('path');
 var baseUrl = 'http://localhost:8080';
+var serverUrl = 'http://localhost:3000/';
 
 var storage = multer.diskStorage({
-  destination: './public/images',  
+  destination: './public/',  
   filename: function(req, file, callback) {
 		callback(null, shortid.generate() + path.extname(file.originalname))
 	}
@@ -134,7 +135,7 @@ app.post('/addPost', upload.single('file'), function (req, res, next){
     if (extantion !== '.png' && extantion !== '.gif' && extantion !== '.jpg' && extantion !== '.webp') {
       res.status(400).send('Only image are allowed!')
     } else {
-      let url = `http://localhost:3000/images/${file.filename}`;
+      let url = `${file.filename}`;
       let title = req.body.title;
       let description = req.body.description;
       sql.photos.addPhoto(req.session.id, url, title, description)
@@ -164,6 +165,10 @@ app.post('/changePhoto', function (req, res, next) {
 app.get('/getUserPhotos', function (req, res, next) {
   sql.photos.getUserPhotos(req.session.id)
     .then(photos => {
+      photos.forEach(function(element, i) {
+        photos[i].url = serverUrl + photos[i].url;
+      }, this);
+      console.log(photos);
       res.send(photos);
       res.end();
     });
@@ -172,6 +177,9 @@ app.get('/getUserPhotos', function (req, res, next) {
 app.get('/getAllPhotos', function (req, res, next) {
   sql.photos.getAllPhotos(req.session.id)
     .then(photos => {
+      photos.forEach(function(element, i) {
+        photos[i].url = serverUrl + photos[i].url;
+      }, this);
       res.send(photos);
       res.end();
     });
